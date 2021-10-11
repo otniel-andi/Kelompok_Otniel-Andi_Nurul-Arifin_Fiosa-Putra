@@ -1,0 +1,62 @@
+from controller import Robot
+robot = Robot()
+timestep = int(robot.getBasicTimeStep())
+
+timestep = 64
+max_speed = 8
+#motor
+left_motor = robot.getDevice('motor_1')
+right_motor = robot.getDevice('motor_2')
+left_motor.setPosition(float('inf'))
+right_motor.setPosition(float('inf'))
+left_motor.setVelocity(0.0)
+right_motor.setVelocity(0.0)
+
+#IR sensor
+right_irr1 = robot.getDevice('IRR1')
+right_irr1.enable(timestep)
+right_irr2 = robot.getDevice('IRR2')
+right_irr2.enable(timestep)
+mid_ircl = robot.getDevice('IRCL')
+mid_ircl.enable(timestep)
+mid_ircr = robot.getDevice('IRCR')
+mid_ircr.enable(timestep)
+left_irl1 = robot.getDevice('IRL1')
+left_irl1.enable(timestep)
+left_irl2 = robot.getDevice('IRL2')
+left_irl2.enable(timestep)
+
+#simulation 
+#main loop:
+while robot.step(timestep) != -1:
+    right_irr1_val = right_irr1.getValue()
+    right_irr2_val = right_irr2.getValue()
+    mid_ircl_val = mid_ircl.getValue()
+    mid_ircr_val = mid_ircr.getValue()
+    left_irl1_val = left_irl1.getValue()
+    left_irl2_val = left_irl2.getValue()
+    print("left: {} mid: {} right: {}".format(left_irl1_val, left_irl2_val, mid_ircl_val, mid_ircr_val, right_irr1_val, right_irr2_val))
+    
+    left_speed = max_speed
+    right_speed = max_speed
+    
+    #Process sensor data
+    if left_irl1_val < 610 and left_irl2_val > 610 and mid_ircl_val > 600 and mid_ircr_val > 600 and right_irr1_val < 600 and right_irr2_val > 600:
+    	left_motor.setVelocity(left_speed)
+    	right_motor.setVelocity(right_speed) #MAJU
+    if left_irl1_val < 180 and left_irl2_val < 180 and mid_ircl_val > 50 and mid_ircr_val > 50 and right_irr1_val < 1000 and right_irr2_val > 1000:
+    	left_motor.setVelocity(left_speed)
+    	right_motor.setVelocity(0) #BELOK KANAN
+    if left_irl1_val<180 and left_irl2_val<180 and mid_ircl_val>=50 and mid_ircr_val>=50 and right_irr1_val<1000 and right_irr2_val>=1000:
+    	left_motor.setVelocity(0)
+    	right_motor.setVelocity(right_speed) #BELOK KIRI
+    if left_irl1_val<180 and left_irl2_val<180 and mid_ircl_val>=50 and mid_ircr_val>=50 and right_irr1_val<1000 and right_irr2_val>=1000:
+    	left_motor.setVelocity(0)
+    	right_motor.setVelocity(right_speed) #PERTIGAAN
+    if left_irl1_val<180 and left_irl2_val<180 and mid_ircl_val>=50 and mid_ircr_val>=50 and right_irr1_val<1000 and right_irr2_val>=1000:
+    	left_motor.setVelocity(left_speed)
+    	right_motor.setVelocity(0) #PALANG BERHENTI
+    if left_irl1_val<180 and left_irl2_val<180 and mid_ircl_val>=50 and mid_ircr_val>=50 and right_irr1_val<1000 and right_irr2_val>=1000:
+    	left_motor.setVelocity(left_speed)
+    	right_motor.setVelocity(right_speed) #PUTAR BALIK
+    pass
